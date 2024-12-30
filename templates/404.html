@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-content text-center">
+        <h1>404</h1>
+        <h2>الصفحة غير موجودة</h2>
+        <p>عذراً، الصفحة التي تبحث عنها غير موجودة.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            العودة للصفحة الرئيسية
+        </a>
+    </div>
+</div>
+{% endblock %}

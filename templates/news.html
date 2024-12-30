@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأخبار العاجلة - خريطة فلسطين المباشرة</title>
+    <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.5.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-map-marked-alt"></i>
+                خريطة فلسطين المباشرة
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h3>الأخبار العاجلة</h3>
+        <ul id="news-list" class="list-group">
+            <!-- News items will be dynamically inserted here -->
+        </ul>
+    </div>
+
+    <script>
+        // Fetch and display news from Al Jazeera, Al Mayadeen, and Channel 12
+        async function fetchNews() {
+            const newsSources = [
+                'https://www.aljazeera.net/aljazeera-news',
+                'https://www.almayadeen.net/news',
+                'https://www.mako.co.il/news-channel12'
+            ];
+            const newsList = document.getElementById('news-list');
+            newsList.innerHTML = '';
+
+            for (const source of newsSources) {
+                const response = await fetch(source);
+                const newsItems = await response.json(); // Assume JSON format for simplicity
+
+                newsItems.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = `${item.title} - ${item.source}`;
+                    newsList.appendChild(listItem);
+                });
+            }
+        }
+
+        fetchNews();
+    </script>
+</body>
+</html>

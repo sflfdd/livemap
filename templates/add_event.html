@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">إضافة حدث جديد</h3>
+        </div>
+        <div class="card-body">
+            <form id="addEventForm" method="POST">
+                <!-- اسم الموقع -->
+                <div class="form-group mb-3">
+                    <label for="locationName" class="form-label">
+                        اسم الموقع *
+                        <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                           title="اكتب اسم المنطقة للبحث عنها على الخريطة (مثال: غزة، رفح، خان يونس)"></i>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="locationName" name="locationName" required
+                               placeholder="اكتب اسم المنطقة للبحث">
+                        <button class="btn btn-outline-secondary" type="button" id="searchLocation">
+                            <i class="fas fa-search"></i> بحث
+                        </button>
+                    </div>
+                    <small class="text-muted">سيتم البحث عن الموقع تلقائياً على الخريطة</small>
+                </div>
+
+                <!-- رابط خرائط جوجل -->
+                <div class="form-group mb-3">
+                    <label for="googleMapsLink" class="form-label">
+                        رابط خرائط جوجل
+                        <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                           title="يمكنك لصق رابط من خرائط جوجل وسيتم تحديد الموقع تلقائياً"></i>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="googleMapsLink" name="googleMapsLink"
+                               placeholder="الصق رابط خرائط جوجل هنا">
+                        <button class="btn btn-outline-secondary" type="button" id="parseGoogleLink">
+                            <i class="fas fa-map-marker-alt"></i> تحديد الموقع
+                        </button>
+                    </div>
+                    <small class="text-muted">انسخ الرابط من خرائط جوجل والصقه هنا</small>
+                </div>
+
+                <!-- تحديد الموقع الحالي -->
+                <div class="form-group mb-3">
+                    <label class="form-label">
+                        موقعي الحالي
+                        <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                           title="استخدم موقعك الحالي كموقع للحدث"></i>
+                    </label>
+                    <div>
+                        <button type="button" class="btn btn-outline-primary" id="getCurrentLocation">
+                            <i class="fas fa-location-arrow"></i>
+                            تحديد موقعي الحالي
+                        </button>
+                    </div>
+                    <small class="text-muted">سيتم طلب إذن الوصول لموقعك</small>
+                </div>
+
+                <!-- الخريطة التفاعلية -->
+                <div class="form-group mb-3">
+                    <label class="form-label">الموقع على الخريطة</label>
+                    <div id="map" style="height: 400px;" class="border rounded"></div>
+                    <small class="text-muted">يمكنك النقر على الخريطة لتحديد الموقع بدقة</small>
+                </div>
+
+                <!-- الإحداثيات -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="latitude" class="form-label">خط العرض</label>
+                        <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="longitude" class="form-label">خط الطول</label>
+                        <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+                    </div>
+                </div>
+
+                <!-- معلومات الحدث -->
+                <div class="form-group mb-3">
+                    <label for="eventType" class="form-label">نوع الحدث *</label>
+                    <select class="form-select" id="eventType" name="eventType" required>
+                        <option value="">اختر نوع الحدث</option>
+                        <option value="شهداء">شهداء</option>
+                        <option value="قصف">قصف</option>
+                        <option value="هدم منازل">هدم منازل</option>
+                        <option value="اعتقالات">اعتقالات</option>
+                        <option value="مظاهرات">مظاهرات</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="eventDescription" class="form-label">وصف الحدث *</label>
+                    <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="eventSource" class="form-label">المصدر</label>
+                    <input type="text" class="form-control" id="eventSource" name="eventSource">
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    إضافة الحدث
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- نص المساعدة -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">دليل إضافة الأحداث</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>طرق تحديد موقع الحدث:</h6>
+                <ol>
+                    <li>
+                        <strong>البحث باسم المنطقة:</strong>
+                        <p>اكتب اسم المنطقة في الخانة الأولى واضغط على زر البحث</p>
+                    </li>
+                    <li>
+                        <strong>استخدام رابط خرائط جوجل:</strong>
+                        <p>انسخ رابط الموقع من خرائط جوجل والصقه في الخانة المخصصة</p>
+                    </li>
+                    <li>
+                        <strong>تحديد موقعك الحالي:</strong>
+                        <p>اضغط على زر "تحديد موقعي الحالي" لاستخدام موقعك الحالي</p>
+                    </li>
+                    <li>
+                        <strong>النقر على الخريطة:</strong>
+                        <p>يمكنك النقر مباشرة على الخريطة لتحديد موقع الحدث بدقة</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // تهيئة الخريطة
+    var map = L.map('map').setView([31.5, 34.45], 9);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    var marker;
+    var searchRadius;
+    
+    // دالة لتحديث الإحداثيات
+    function updateCoordinates(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+        
+        // تحديث الماركر
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], {draggable: true}).addTo(map);
+            marker.on('dragend', function(e) {
+                var position = marker.getLatLng();
+                updateCoordinates(position.lat, position.lng);
+            });
+        }
+        
+        // تحديث دائرة نصف القطر (250 متر)
+        if (searchRadius) {
+            searchRadius.setLatLng([lat, lng]);
+        } else {
+            searchRadius = L.circle([lat, lng], {
+                radius: 250,
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.1
+            }).addTo(map);
+        }
+        
+        map.setView([lat, lng], 15);
+    }
+    
+    // البحث عن موقع
+    document.getElementById('searchLocation').addEventListener('click', function() {
+        var locationName = document.getElementById('locationName').value;
+        if (locationName) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        updateCoordinates(parseFloat(data[0].lat), parseFloat(data[0].lon));
+                    } else {
+                        alert('لم يتم العثور على الموقع');
+                    }
+                });
+        }
+    });
+    
+    // استخراج الإحداثيات من رابط خرائط جوجل
+    document.getElementById('parseGoogleLink').addEventListener('click', function() {
+        var link = document.getElementById('googleMapsLink').value;
+        var regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+        var match = link.match(regex);
+        
+        if (match) {
+            updateCoordinates(parseFloat(match[1]), parseFloat(match[2]));
+        } else {
+            alert('لم يتم العثور على إحداثيات في الرابط');
+        }
+    });
+    
+    // تحديد الموقع الحالي
+    document.getElementById('getCurrentLocation').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    updateCoordinates(position.coords.latitude, position.coords.longitude);
+                },
+                function(error) {
+                    alert('حدث خطأ في تحديد موقعك: ' + error.message);
+                }
+            );
+        } else {
+            alert('متصفحك لا يدعم تحديد الموقع');
+        }
+    });
+    
+    // النقر على الخريطة
+    map.on('click', function(e) {
+        updateCoordinates(e.latlng.lat, e.latlng.lng);
+    });
+    
+    // تفعيل التلميحات
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+{% endblock %}

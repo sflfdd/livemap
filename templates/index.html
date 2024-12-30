@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خريطة فلسطين المباشرة</title>
+    
+    <!-- Bootstrap RTL CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+    <!-- Breaking News Ticker -->
+    <div class="breaking-news-ticker">
+        <div class="ticker-label">
+            <i class="fas fa-bolt"></i>
+            عاجل
+        </div>
+        <div class="ticker-content">
+            <div class="ticker-wrapper">
+                <div class="ticker-items">
+                    <!-- News items will be inserted here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-map-marked-alt"></i>
+                خريطة فلسطين المباشرة
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-user-edit"></i>
+                            دخول الصحفيين
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Breaking News Section -->
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-circle"></i>
+                            أخبار عاجلة
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="breaking-news-carousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner" id="breaking-news-container">
+                                <!-- سيتم تحديث هذا القسم ديناميكياً -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <div class="sidebar bg-white shadow-sm">
+                <div class="p-3">
+                    <!-- Search Location -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">البحث عن موقع</h5>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="location-search" placeholder="اكتب اسم الموقع">
+                            <button class="btn btn-primary" type="button" id="search-button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">إحصائيات</h5>
+                        <div class="stats-container">
+                            <div class="stat-card mb-2 p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>عدد الشهداء</span>
+                                    <span class="badge bg-danger">{{ stats.martyrs_count }}</span>
+                                </div>
+                            </div>
+                            <div class="stat-card mb-2 p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>المنازل المدمرة</span>
+                                    <span class="badge bg-warning">{{ stats.destroyed_homes }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Types Filter -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">تصفية الأحداث</h5>
+                        <div class="event-filters">
+                            {% for type in event_types %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="{{ type }}" id="filter-{{ type }}">
+                                <label class="form-check-label" for="filter-{{ type }}">
+                                    {{ type }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div id="map" class="flex-grow-1"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+</html>
